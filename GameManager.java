@@ -1,6 +1,6 @@
 public class GameManager {
     private int score;
-    private int gianSpeed;
+    private double gianSpeed;
     private int missedGians;
     private boolean isGameOver;
     private int highScore; // Lưu trữ kỷ lục
@@ -16,7 +16,8 @@ public class GameManager {
     public void increaseScore(int points) {
         score += points;
         if (score % 100 == 0 && gianSpeed <=10 ) {
-            gianSpeed++; // Tăng tốc độ gián mỗi 100 điểm 
+
+            gianSpeed = gianSpeed +0.5; // Tăng tốc độ gián mỗi 50 điểm
         }
     }
 
@@ -55,7 +56,7 @@ public class GameManager {
         return score;
     }
 
-    public int getGianSpeed() {
+    public double getGianSpeed() {
         return gianSpeed;
     }
 

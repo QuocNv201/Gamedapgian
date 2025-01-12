@@ -10,7 +10,7 @@ public class Gian {
     }    
 
     public Gian(int x, int y) {
-        this.rectangle = new Rectangle(x, y, 80, 100); // Gián có kích thước 80x100
+        this.rectangle = new Rectangle(x, y, 100, 120); // Gián có kích thước 75x100
         this.isSmashed = false;
         this.smashedTime = 0;
     }
@@ -19,7 +19,7 @@ public class Gian {
         return rectangle;
     }
 
-    public void move(int speed) {
+    public void move(double speed) {
         rectangle.y += speed;
     }
 

@@ -99,7 +99,6 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
             // Vẽ thời gian đếm ngược nếu đang đếm ngược
             if (isCountdownActive) {
                 gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\jungle-style-videogame-190083.wav"); // Thay đường dẫn tới file nhạc nền
-
                 int secondsLeft = countdownTime / 1000 + 1; // Chuyển đổi thời gian đếm ngược sang giây và làm tròn lên
                 g.setFont(new Font("Arial", Font.BOLD, 100));
                 g.setColor(Color.RED);
@@ -309,7 +308,6 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
                 gameManager.increaseScore(10); // Tăng điểm khi giết gián
                 gameSound.playSoundEffect("C:\\Users\\MRQUOC\\Downloads\\quan dong que.wav");
 
-
                 break;  // Chỉ giết một gián tại mỗi lần click
             }
         }
@@ -319,7 +317,6 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
         gameManager.resetGame();
         gians.clear();
         gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\jungle-style-videogame-190083.wav"); // Thay đường dẫn tới file nhạc nền
-
         repaint();
     }
 
