@@ -28,7 +28,7 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
         gameManager = new GameManager();
         random = new Random();
         gameSound = new GameSound();
-        gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\jungle-style-videogame-190083.wav"); // Thay đường dẫn tới file nhạc nền
+        gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\nhac nen.wav"); // Thay đường dẫn tới file nhạc nền
 
         // Tải hình ảnh nền
         try {
@@ -45,7 +45,7 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
         setFocusable(true);
         addMouseListener(this);
         addMouseMotionListener(this);
-        timer = new Timer(20, this);
+        timer = new Timer(20, this); // Tạo timer với thời gian 20ms
         timer.start();
 
         // Cập nhật con chuột mặc định
@@ -74,16 +74,16 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
         });
 
         // Khởi tạo vùng nút tạm dừng
-        int pauseButtonWidth = 40;
-        int pauseButtonHeight = 40;
+        int pauseButtonWidth = 40; // Chiều rộng của nút tạm dừng
+        int pauseButtonHeight = 40; // Chiều cao của nút tạm dừng
         int pauseButtonX = getWidth() - pauseButtonWidth - 10; // 10 là khoảng cách từ cạnh khung hình
         int pauseButtonY = 10; // Khoảng cách từ cạnh trên của khung hình
         pauseButtonRect = new Rectangle(pauseButtonX, pauseButtonY, pauseButtonWidth, pauseButtonHeight);
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    @Override 
+    protected void paintComponent(Graphics g) {  
+        super.paintComponent(g); 
 
         // Nếu game đang dừng, vẽ nền và các gián như bình thường
         if (isGamePaused) {
@@ -92,13 +92,13 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
 
             // Vẽ gián
             for (Gian gian : gians) {
-                Rectangle rect = gian.getRectangle();
+                Rectangle rect = gian.getRectangle(); 
                 g.drawImage(gian.isSmashed() ? gianSmashedImage : gianImage, rect.x, rect.y, rect.width, rect.height, this);
             }
 
             // Vẽ thời gian đếm ngược nếu đang đếm ngược
             if (isCountdownActive) {
-                gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\jungle-style-videogame-190083.wav"); // Thay đường dẫn tới file nhạc nền
+                gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\nhac nen.wav"); // Thay đường dẫn tới file nhạc nền
                 int secondsLeft = countdownTime / 1000 + 1; // Chuyển đổi thời gian đếm ngược sang giây và làm tròn lên
                 g.setFont(new Font("Arial", Font.BOLD, 100));
                 g.setColor(Color.RED);
@@ -106,11 +106,11 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
             } else {
                 // Vẽ biểu tượng tạm dừng (nút tam giác nghiêng)
                 g.setColor(Color.WHITE);
-                g.fillPolygon(new int[]{getWidth() / 2 - 20, getWidth() / 2 + 20, getWidth() / 2 - 20},
-                        new int[]{getHeight() / 2 - 20, getHeight() / 2, getHeight() / 2 + 20}, 3);
+                g.fillPolygon(new int[]{getWidth() / 2 - 20, getWidth() / 2 + 20, getWidth() / 2 - 20}, // 3 điểm tạo nên tam giác
+                        new int[]{getHeight() / 2 - 20, getHeight() / 2, getHeight() / 2 + 20}, 3); // 3 điểm tạo nên tam giác
             }
 
-            // Vẽ điểm số, kỷ lục và số gián trượt khi game dừng
+            // Vẽ điểm số, kỷ lục và số gián đập trượt khi game dừng
             g.setColor(Color.LIGHT_GRAY);
             g.setFont(new Font("Arial", Font.BOLD, 20));
             g.drawString("Điểm: " + gameManager.getScore(), 10, 20);
@@ -129,7 +129,7 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
             g.drawImage(gian.isSmashed() ? gianSmashedImage : gianImage, rect.x, rect.y, rect.width, rect.height, this);
         }
 
-        // Vẽ vùng va chạm (đạn)
+        // Vẽ vùng va chạm vợt
         Point mousePos = getMousePosition();
         if (mousePos != null && isMousePressed) {
             g.drawImage(shootImage, mousePos.x - shootImage.getWidth(null) / 2, mousePos.y - shootImage.getHeight(null) / 2, this);
@@ -175,12 +175,12 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {    // Hàm này được gọi khi nút tạm dừng được nhấn
         if (isGamePaused) {
             if (isCountdownActive) {
                 countdownTime -= 20; // Giảm thời gian đếm ngược (20 milliseconds)
                 if (countdownTime <= 0) {
-                    isCountdownActive = false;
+                    isCountdownActive = false; // Tắt đếm ngược
                     isGamePaused = false;// Tiếp tục trò chơi
                 }
             }
@@ -189,12 +189,12 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
             return;
         }
 
-        if (gameManager.isGameOver())
-            return;
+        if (gameManager.isGameOver()) 
+            return; 
 
-        moveGians();
-        spawnGians();
-        repaint();
+        moveGians(); 
+        spawnGians(); 
+        repaint(); 
     }
 
     private void moveGians() {
@@ -215,7 +215,7 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
                 gianIterator.remove();
                 gameManager.incrementMissedGians();
                 if (gameManager.getMissedGians() >= 5) {// Nếu có 5 gián ra ngoài, kết thúc game
-                    gameSound.playSoundend("C:\\Users\\MRQUOC\\Downloads\\hihi.wav");
+                    gameSound.playSoundend("C:\\Users\\MRQUOC\\Downloads\\game over.wav");
                     gameManager.endGame();
                     gameSound.stopBackgroundMusic(); // Dừng nhạc nền
                 }
@@ -306,7 +306,7 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
             if (gian.contains(point) && !gian.isSmashed()) {  // Kiểm tra chỉ giết gián chưa bị đập
                 gian.smash();
                 gameManager.increaseScore(10); // Tăng điểm khi giết gián
-                gameSound.playSoundEffect("C:\\Users\\MRQUOC\\Downloads\\quan dong que.wav");
+                gameSound.playSoundEffect("C:\\Users\\MRQUOC\\Downloads\\bep bep.wav");
 
                 break;  // Chỉ giết một gián tại mỗi lần click
             }
@@ -316,7 +316,7 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
     private void restartGame() {
         gameManager.resetGame();
         gians.clear();
-        gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\jungle-style-videogame-190083.wav"); // Thay đường dẫn tới file nhạc nền
+        gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\nhac nen.wav"); // Thay đường dẫn tới file nhạc nền
         repaint();
     }
 
