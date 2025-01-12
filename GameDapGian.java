@@ -1,4 +1,3 @@
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
         gians = new ArrayList<>();
         gameManager = new GameManager();
         random = new Random();
-        gameSound = new GameSound(); 
+        gameSound = new GameSound();
         gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\jungle-style-videogame-190083.wav"); // Thay đường dẫn tới file nhạc nền
 
         // Tải hình ảnh nền
@@ -54,12 +53,24 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
 
         // Thêm lắng nghe phím để dừng game
         addKeyListener(new KeyAdapter() {
-            @Override
+
+            boolean isPaused = false;
+
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    togglePause();
+                    isPaused = !isPaused; // Đảo trạng thái giữa pause và resume
+
+                    if(isPaused==true){
+                        startCountdown();
+                    }
+                    if(isPaused==false) {
+                        togglePause();
+                    }
                 }
             }
+
+
+
         });
 
         // Khởi tạo vùng nút tạm dừng
@@ -76,6 +87,7 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
 
         // Nếu game đang dừng, vẽ nền và các gián như bình thường
         if (isGamePaused) {
+            gameSound.stopBackgroundMusic(); // Dừng nhạc nền
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
 
             // Vẽ gián
@@ -86,6 +98,8 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
 
             // Vẽ thời gian đếm ngược nếu đang đếm ngược
             if (isCountdownActive) {
+                gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\jungle-style-videogame-190083.wav"); // Thay đường dẫn tới file nhạc nền
+
                 int secondsLeft = countdownTime / 1000 + 1; // Chuyển đổi thời gian đếm ngược sang giây và làm tròn lên
                 g.setFont(new Font("Arial", Font.BOLD, 100));
                 g.setColor(Color.RED);
@@ -149,7 +163,7 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
             int x = (getWidth() - fm.stringWidth(gameOverText)) / 2; // Căn giữa theo chiều ngang
             int y = getHeight() / 2 - 40; // Căn giữa theo chiều dọc
             g.drawString(gameOverText, x, y);
-        
+
             // Cỡ chữ "Click to Restart" nhỏ hơn và căn giữa
             g.setFont(new Font("Arial", Font.PLAIN, 30)); // Cỡ chữ nhỏ hơn
             g.setColor(Color.WHITE);
@@ -159,7 +173,7 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
             y = getHeight() / 2 + 40; // Căn giữa theo chiều dọc
             g.drawString(restartText, x, y);
         }
-    }        
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -168,14 +182,16 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
                 countdownTime -= 20; // Giảm thời gian đếm ngược (20 milliseconds)
                 if (countdownTime <= 0) {
                     isCountdownActive = false;
-                    isGamePaused = false; // Tiếp tục trò chơi
+                    isGamePaused = false;// Tiếp tục trò chơi
                 }
             }
+
             repaint();
             return;
         }
 
-        if (gameManager.isGameOver()) return;
+        if (gameManager.isGameOver())
+            return;
 
         moveGians();
         spawnGians();
@@ -194,14 +210,12 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
                 }
                 continue;
             }
-
             gian.move(gameManager.getGianSpeed());
-
             // Nếu gián ra ngoài màn hình, loại bỏ gián và kiểm tra thua
             if (gian.isOutOfBounds(getHeight())) {
                 gianIterator.remove();
                 gameManager.incrementMissedGians();
-                if (gameManager.getMissedGians() >= 5) { // Nếu có 5 gián ra ngoài, kết thúc game
+                if (gameManager.getMissedGians() >= 5) {// Nếu có 5 gián ra ngoài, kết thúc game
                     gameSound.playSoundend("C:\\Users\\MRQUOC\\Downloads\\hihi.wav");
                     gameManager.endGame();
                     gameSound.stopBackgroundMusic(); // Dừng nhạc nền
@@ -209,11 +223,10 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
             }
         }
     }
-
     private void spawnGians() {
         // Tăng xác suất xuất hiện gián mỗi khi đạt điểm nhất định
         int spawnChance = 2 + (gameManager.getScore() / 300); // Tăng xác suất mỗi khi có 300 điểm
-            spawnChance = Math.min(spawnChance, 5);
+        spawnChance = Math.min(spawnChance, 5);
         // Kiểm tra số lượng gián hiện tại có vượt quá spawnChance không
         if (gians.size() >= spawnChance) {
             return; // Không spawn thêm gián nếu đã đạt giới hạn
@@ -296,6 +309,7 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
                 gameManager.increaseScore(10); // Tăng điểm khi giết gián
                 gameSound.playSoundEffect("C:\\Users\\MRQUOC\\Downloads\\quan dong que.wav");
 
+
                 break;  // Chỉ giết một gián tại mỗi lần click
             }
         }
@@ -304,8 +318,8 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
     private void restartGame() {
         gameManager.resetGame();
         gians.clear();
-        gameSound.stopBackgroundMusic(); // Dừng nhạc nền cũ
-        gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\jungle-style-videogame-190083.wav"); // Phát lại nhạc nền
+        gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\jungle-style-videogame-190083.wav"); // Thay đường dẫn tới file nhạc nền
+
         repaint();
     }
 
