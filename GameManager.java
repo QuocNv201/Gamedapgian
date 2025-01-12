@@ -15,8 +15,8 @@ public class GameManager {
 
     public void increaseScore(int points) {
         score += points;
-        if (score % 50 == 0) {
-            gianSpeed++; // Tăng tốc độ gián mỗi 50 điểm
+        if (score % 100 == 0 ) {
+            gianSpeed++; // Tăng tốc độ gián mỗi 100 điểm 
         }
     }
 

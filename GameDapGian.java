@@ -1,3 +1,4 @@
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -10,14 +11,13 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
     private ArrayList<Gian> gians;
     private GameManager gameManager;
     private Random random;
-
+    private GameSound gameSound; // Quản lý âm thanh trò chơi
     private boolean isMousePressed = false;
     private Image backgroundImage; // Hình ảnh nền
     private Image cursorImage; // Hình ảnh con chuột
     private Image gianImage; // Hình ảnh gián
     private Image gianSmashedImage; // Hình ảnh gián bị đập
     private Image shootImage; // Hình ảnh vùng va chạm
-
     private boolean isGamePaused = false; // Biến kiểm tra trạng thái game
     private boolean isCountdownActive = false; // Biến kiểm tra trạng thái đếm ngược
     private int countdownTime = 0; // Thời gian đếm ngược còn lại
@@ -28,6 +28,8 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
         gians = new ArrayList<>();
         gameManager = new GameManager();
         random = new Random();
+        gameSound = new GameSound(); 
+        gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\jungle-style-videogame-190083.wav"); // Thay đường dẫn tới file nhạc nền
 
         // Tải hình ảnh nền
         try {
@@ -139,14 +141,25 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
 
         // Game Over screen
         if (gameManager.isGameOver()) {
-            g.setFont(new Font("Arial", Font.BOLD, 40));
+            // Cỡ chữ "Game Over!" lớn hơn và căn giữa
+            g.setFont(new Font("Arial", Font.BOLD, 60)); // Cỡ chữ lớn hơn
             g.setColor(Color.RED);
-            g.drawString("Game Over!", getWidth() / 2 - 100, getHeight() / 2 - 40);
-            g.setFont(new Font("Arial", Font.PLAIN, 20));
+            String gameOverText = "Game Over!";
+            FontMetrics fm = g.getFontMetrics();
+            int x = (getWidth() - fm.stringWidth(gameOverText)) / 2; // Căn giữa theo chiều ngang
+            int y = getHeight() / 2 - 40; // Căn giữa theo chiều dọc
+            g.drawString(gameOverText, x, y);
+        
+            // Cỡ chữ "Click to Restart" nhỏ hơn và căn giữa
+            g.setFont(new Font("Arial", Font.PLAIN, 30)); // Cỡ chữ nhỏ hơn
             g.setColor(Color.WHITE);
-            g.drawString("Click to Restart", getWidth() / 2 - 75, getHeight() / 2 + 40);
+            String restartText = "Click to Restart";
+            fm = g.getFontMetrics();
+            x = (getWidth() - fm.stringWidth(restartText)) / 2; // Căn giữa theo chiều ngang
+            y = getHeight() / 2 + 40; // Căn giữa theo chiều dọc
+            g.drawString(restartText, x, y);
         }
-    }
+    }        
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -176,8 +189,8 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
             Gian gian = gianIterator.next();
 
             if (gian.isSmashed()) {
-                if (System.currentTimeMillis() - gian.getSmashedTime() > 300) {
-                    gianIterator.remove(); // Loại bỏ gián đã bị đập sau 0,3 giây
+                if (System.currentTimeMillis() - gian.getSmashedTime() > 200) {
+                    gianIterator.remove(); // Loại bỏ gián đã bị đập sau 0,2 giây
                 }
                 continue;
             }
@@ -189,36 +202,42 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
                 gianIterator.remove();
                 gameManager.incrementMissedGians();
                 if (gameManager.getMissedGians() >= 5) { // Nếu có 5 gián ra ngoài, kết thúc game
+                    gameSound.playSoundend("C:\\Users\\MRQUOC\\Downloads\\hihi.wav");
                     gameManager.endGame();
+                    gameSound.stopBackgroundMusic(); // Dừng nhạc nền
                 }
             }
         }
     }
 
     private void spawnGians() {
-        // Tạo gián mới với xác suất
-        int spawnChance = 1 + (gameManager.getScore() / 50); // Tăng xác suất mỗi khi có 50 điểm
-
-        // Kiểm tra và spawn gián không chồng lấn
-        if (random.nextInt(100) < spawnChance) {
-            int randomX;
-            boolean positionOccupied;
-            do {
-                randomX = random.nextInt(getWidth() - 50); // Vị trí X ngẫu nhiên (gián có chiều rộng 50px)
-                positionOccupied = false;
-
-                // Kiểm tra xem gián có chồng lên nhau không
-                for (Gian gian : gians) {
-                    if (Math.abs(gian.getRectangle().x - randomX) < 50) { // Kiểm tra xem gián đã có chưa (gián có chiều rộng 50px)
-                        positionOccupied = true;
-                        break;
-                    }
-                }
-            } while (positionOccupied); // Lặp lại cho đến khi tìm được vị trí không bị chồng lên
-
-            gians.add(new Gian(randomX, 0)); // Tạo gián mới với vị trí X không chồng lên
+        // Tăng xác suất xuất hiện gián mỗi khi đạt điểm nhất định
+        int spawnChance = 2 + (gameManager.getScore() / 300); // Tăng xác suất mỗi khi có 300 điểm
+            spawnChance = Math.min(spawnChance, 5);
+        // Kiểm tra số lượng gián hiện tại có vượt quá spawnChance không
+        if (gians.size() >= spawnChance) {
+            return; // Không spawn thêm gián nếu đã đạt giới hạn
         }
+
+        // Tạo gián mới nếu số lượng gián hiện tại chưa đạt giới hạn
+        int randomX;
+        boolean positionOccupied;
+        do {
+            randomX = random.nextInt(getWidth() - 50); // Vị trí X ngẫu nhiên (gián có chiều rộng 50px)
+            positionOccupied = false;
+
+            // Kiểm tra xem gián có chồng lên nhau không
+            for (Gian gian : gians) {
+                if (Math.abs(gian.getRectangle().x - randomX) < 50) { // Kiểm tra xem gián đã có chưa (gián có chiều rộng 50px)
+                    positionOccupied = true;
+                    break;
+                }
+            }
+        } while (positionOccupied); // Lặp lại cho đến khi tìm được vị trí không bị chồng lên
+
+        gians.add(new Gian(randomX, 0)); // Tạo gián mới với vị trí X không chồng lên
     }
+
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -238,20 +257,8 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
-        isMousePressed = true;
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        isMousePressed = false;
-    }
-
-    @Override
     public void mouseDragged(MouseEvent e) {
-        if (isMousePressed) {
-            shootAt(e.getPoint());
-        }
+
     }
 
     @Override
@@ -266,34 +273,39 @@ public class GameDapGian extends JPanel implements ActionListener, MouseListener
     public void mouseExited(MouseEvent e) {
     }
 
+    @Override
+    public void mousePressed(MouseEvent e) {
+        isMousePressed = true;  // Chỉ khi chuột nhấn mới cho phép giết gián
+        shootAt(e.getPoint());  // Chỉ thực hiện hành động khi nhấn chuột
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        isMousePressed = false; // Khi chuột được thả, không giết gián nữa
+    }
+
     private void shootAt(Point point) {
-        boolean shotHit = false;
-
-        // Lấy kích thước của shootImage (đạn) để tạo vùng va chạm
-        int shootWidth = shootImage.getWidth(null);
-        int shootHeight = shootImage.getHeight(null);
-
-        // Tạo một vùng va chạm xung quanh hình ảnh bắn (đạn)
-        Rectangle shootArea = new Rectangle(point.x - shootWidth / 2, point.y - shootHeight / 2, shootWidth, shootHeight);
-
-        // Kiểm tra va chạm với gián trong vùng này
-        Iterator<Gian> gianIterator = gians.iterator();
-        while (gianIterator.hasNext()) {
-            Gian gian = gianIterator.next();
-            if (shootArea.intersects(gian.getRectangle())) {  // Kiểm tra xem vùng bắn có giao với gián hay không
-                gian.smash(); // Đánh dấu gián bị đập
-                gameManager.increaseScore(10);  // Tăng điểm số
-                shotHit = true;
-                break;
-            }
+        if (isGamePaused || isCountdownActive) {
+            return;
         }
 
-        repaint();  // Vẽ lại màn hình
+        // Kiểm tra tất cả gián và xem chúng có bị click trúng không
+        for (Gian gian : gians) {
+            if (gian.contains(point) && !gian.isSmashed()) {  // Kiểm tra chỉ giết gián chưa bị đập
+                gian.smash();
+                gameManager.increaseScore(10); // Tăng điểm khi giết gián
+                gameSound.playSoundEffect("C:\\Users\\MRQUOC\\Downloads\\quan dong que.wav");
+
+                break;  // Chỉ giết một gián tại mỗi lần click
+            }
+        }
     }
 
     private void restartGame() {
         gameManager.resetGame();
         gians.clear();
+        gameSound.stopBackgroundMusic(); // Dừng nhạc nền cũ
+        gameSound.playBackgroundMusic("C:\\Users\\MRQUOC\\Downloads\\jungle-style-videogame-190083.wav"); // Phát lại nhạc nền
         repaint();
     }
 
